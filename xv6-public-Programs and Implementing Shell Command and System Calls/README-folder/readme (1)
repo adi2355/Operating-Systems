@@ -1,0 +1,118 @@
+Project 1 Readme
+I have also submitted a pdf Readme that has all the screenshots attached.
+Group Members:
+Prati Jain
+Aditya Khetarpal
+Rajdeep Savani
+
+System Environment
+Operating System: Ubuntu 24.04 LTS
+COmpiler: 13.2.0
+QEMU version: 8.2.2
+
+Part 1: Hello World Program
+
+Implementation:
+1 Created a new file named hello.c in the xv6 source directory to output "Hello Xv6!"
+2 The program uses the printf function to output "Hello Xv6!" to the console
+3 The program calls exit() to terminate properly, as required in xv6 user programs
+
+Modification to Makefile:
+Added _hello to the UPROGS list in the Makefile to ensure it's compiled and included in the xv6 image:
+
+Files modified: hello.c and Makefile
+
+Compile and Run:
+1 After implementing the program and modifying the Makefile, I ran make clean to ensure a fresh build.
+2 I then ran make qemu to compile the entire xv6 system, including the new hello program, and start the xv6 emulation in QEMU.
+3 Once xv6 started in QEMU, I tested the hello program by typing hello at the xv6 shell prompt.
+4 I verified that the output "Hello Xv6!" was displayed correctly.
+
+Challanges faced:
+I had to familiarize myself with the xv6 file structure and the purpose of different header files. Reading the xv6 documentation and other .c files helped me understand which headers were necessary for a basic user program.
+
+Part 2: Modified ls Command
+
+Implementation:
+1 Modified the existing ls.c file in the xv6 source directory.
+2 Implemented the following changes: 
+    a Hiding hidden files and directories: Added a check in the directory listing loop so that files and directories starting with a dot are not listed unless explicitly requested with the -a flag.
+    b Adding "/" at the end of directory names: To make directories easily identifiable, I modified the output to append a / to the names of directories. This was done by modifying the printf statement for directories to include a trailing slash
+    c Implementing "-a" flag to show hidden files: The -a flag allows hidden files (those that start with .) to be shown.I modified the main() function of ls to check if the -a flag is passed as an argument. If it is, the program sets a flag (all=1),allowing hidden files to be shown during listing. 
+
+FIles Modified: ls.c
+
+Compile and Run: 
+1 After implementing the changes, I ran make clean to ensure a fresh build.
+2 I then ran make qemu to compile the entire xv6 system, including the modified ls, and start the xv6 emulation in QEMU.
+3 Once xv6 started in QEMU, I tested the ls command with various scenarios:
+    a ls without any arguments (should hide hidden files)
+    b ls -a (should show all files, including hidden ones)
+
+Challenges faced: 
+Modifying the output format to add the trailing slash for directories while maintaining the output strucutre required adjustchanges of printf statements and received help by my teammate.
+
+Part 3: Writing Hello World Syscall
+
+Implementation:
+1 Added a new system call named hello to the xv6 kernel.
+2 Modified the necessary kernel files to implement the hello system call:
+sysproc.c: Added the sys_hello function that uses cprintf to output "Hello from the Kernel!" to the console.
+syscall.h: Defined a new system call number SYS_hello.
+syscall.c: Added extern int sys_hello(void); and updated the syscalls array to include sys_hello.
+syscalls.h: Added a prototype for sys_hello.
+user.h: Declared the user-space function int hello(void); so it can be called from user programs.
+usys.S: Created a system call stub for hello.
+3 Modified hello.c to call the new hello() system call after printing "Hello Xv6!".
+4 Ensured that all modified files are saved and properly formatted.
+
+Files Modified:
+hello.c
+sysproc.c
+syscall.h
+syscall.c
+syscalls.h
+user.h
+usys.S
+
+Compile and Run:
+1 After implementing the changes, I ran make clean to ensure a fresh build.
+2 Executed make qemu to compile the xv6 system with the new system call and start the QEMU emulator.
+3 In the xv6 shell, ran the hello command.
+4 Verified that the output displays:
+Hello Xv6!
+Hello from the Kernel!
+
+Challenges Faced:
+Understanding the process of adding a new system call in xv6. Reviewed existing system calls like getpid to comprehend the required steps. Ensuring all necessary files were correctly updated to register the new system call. Initially missed updating syscalls.h, which led to compilation errors. Debugging issues where the system call was not recognized. Fixed by correctly defining the system call number in syscall.h and adding the function to syscall.c.
+
+Part 4: Implementing the Sleep Command
+
+Implementation:
+1 Created a new user program sleep.c in the xv6 source directory.
+2 Implemented the main function to accept a single command-line argument for the number of ticks to sleep.
+3 The program checks for the correct number of arguments and validates the input.
+4 It uses the atoi() function to convert the string argument to an integer.
+5 The program calls the existing sleep() system call to pause for the specified number of ticks.
+6 Implemented error handling: If no argument is provided (argc < 2), the program prints an error message to stderr using printf(2, "error message\n");. Called exit(); at the end of the program to terminate properly.
+
+Modification to Makefile:
+Added _sleep to the UPROGS list in the Makefile to ensure it's compiled and included in the xv6 image.
+
+Files Modified:
+sleep.c
+Makefile
+
+Compile and Run:
+1 Ran make clean to ensure a fresh build.
+2 Executed make qemu to compile the xv6 system, including the new sleep program, and start the QEMU emulator.
+3 In the xv6 shell, tested the sleep command:
+Ran sleep 100 to sleep for 100 ticks and observed the pause in the shell.
+Ran sleep without any arguments to confirm that an error message is displayed:
+sleep: missing argument
+Tried invalid input like sleep abc to test robustness 
+Verified that the program terminates successfully after the sleep duration.
+
+Challenges Faced:
+Parsing command-line arguments in xv6 user programs. Referenced echo.c and grep.c to understand how to handle argc and argv. Understanding how ticks correlate to real time in xv6.
+Learned that ticks are increments of the system clock interrupt. Handling invalid input and ensuring the program exits gracefully when no arguments are provided.Implemented checks for argc and used error messages to guide the user.
