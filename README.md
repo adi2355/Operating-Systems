@@ -1,560 +1,383 @@
-Project Overview
-This repository contains a comprehensive series of projects focused on enhancing and extending the xv6 educational operating system. XV6 (or xv6) is a reimplementation of Dennis Ritchie and Ken Thompson's Unix Version 6 (v6), developed at MIT for teaching operating system concepts. It provides a simple yet realistic implementation of a Unix-like system that can run on modern hardware while maintaining the essential architectural elements of Unix.
-These projects systematically modify and extend xv6's functionality across multiple core subsystems. The work begins with basic system call implementations and command modifications, progresses through more complex process scheduling algorithms, explores virtual memory management with lazy allocation techniques, and culminates in extending the file system with support for larger files and symbolic links. Each project builds upon the previous ones, creating a progressively more capable and sophisticated operating system.
-The xv6 environment provides an ideal learning platform because it includes essential operating system components (boot loader, kernel, basic shell) while remaining simple enough to be understood in its entirety. These projects leverage this foundation to explore advanced OS concepts through hands-on implementation.
-Project Goals
-The primary objectives of these projects are to:
+# **Project Overview**
 
-Understand the internals of a Unix-like operating system: Gain deep familiarity with the architecture and implementation details of process management, memory allocation, device management, file systems, and the relationships between these subsystems.
-Gain hands-on experience with system call implementation: Learn the complete lifecycle of system calls from user space to kernel and back, including argument passing, privilege transitions, error handling, and the intricacies of the C calling convention on x86.
-Explore process scheduling algorithms and their implementation: Implement and compare multiple scheduling algorithms (default FIFO, SJF, lottery, priority) and understand their performance characteristics, fairness attributes, and implementation complexity.
-Implement virtual memory concepts including lazy allocation: Understand page tables, address translation, trap handling, and advanced memory management techniques like on-demand (lazy) allocation with locality awareness.
-Extend file system capabilities with advanced features: Modify the existing file system to support larger files through multi-level indirection, implement symbolic links, and add file seek capabilities while maintaining backward compatibility.
-Develop practical skills in operating system development: Gain experience with low-level debugging techniques, system-level programming practices, and understanding complex interactions between hardware and software.
-Learn to debug and test complex system-level code: Master techniques for testing and validating system-level modifications, including comprehensive approaches for verifying correctness across different execution paths.
+This repository contains a comprehensive series of projects focused on **enhancing and extending** the educational operating system **xv6**.  
+**xv6** (or **XV6**) is a reimplementation of Dennis Ritchie and Ken Thompson's **Unix Version 6 (v6)**, developed at MIT for teaching operating system concepts. It provides a simple yet realistic implementation of a Unix-like system that can run on modern hardware while maintaining the essential architectural elements of Unix.
 
-Implementation Details
-Project 1: Basic System Calls and Commands
-This project focuses on fundamental operations in xv6, introducing modifications to existing commands and implementing new system calls:
+These projects systematically modify and extend xv6's functionality across multiple core subsystems. The work begins with **basic system call implementations** and **command modifications**, progresses through **process scheduling algorithms**, explores **virtual memory management** with lazy allocation techniques, and culminates in extending the **file system** with support for larger files and symbolic links.
 
-Data Structures:
+### **Goals**
 
-Process control block (struct proc in proc.h) which maintains process state, process ID, and kernel stack
-File metadata structures (struct stat in stat.h) used by the ls command to distinguish between files and directories
-Syscall function pointer array (syscalls[] in syscall.c) that maps system call numbers to their implementations
-System call argument handling structures for parameter passing from user space to kernel
+1. **Understand the internals of a Unix-like operating system**  
+   Gain deep familiarity with the architecture and implementation details of process management, memory allocation, device management, file systems, and the relationships between these subsystems.
 
+2. **Hands-on experience with system call implementation**  
+   Learn the complete lifecycle of system calls from user space to kernel and back, including argument passing, privilege transitions, and error handling.
 
-Algorithms:
+3. **Explore process scheduling algorithms**  
+   Implement and compare multiple scheduling algorithms (default FIFO, SJF, lottery, priority) and understand their performance characteristics and implementation complexity.
 
-Command-line argument parsing for the sleep command using the argv array passed to main
-File and directory traversal for the ls command using the struct dirent directory entry structure
-System call registration and dispatch mechanism that handles the transition from user space to kernel space
-Process sleep/wakeup mechanism used by the sleep command to pause execution for a specified duration
+4. **Implement virtual memory concepts**  
+   Understand page tables, address translation, trap handling, and advanced memory management techniques like on-demand (lazy) allocation with locality awareness.
 
+5. **Extend file system capabilities**  
+   Modify the existing file system to support larger files (multi-level indirection), implement symbolic links, and add file seek capabilities (e.g., `lseek`).
 
-Challenges and Fixes:
+6. **Develop practical OS development skills**  
+   Gain experience with low-level debugging techniques, system-level programming, and complex interactions between hardware and software.
 
-Understanding the complete system call implementation flow in xv6, which requires modifications to multiple files (syscall.h, syscall.c, user.h, usys.S)
-Properly handling hidden files (those starting with '.') in the ls command while maintaining the original functionality
-Implementing the directory indicator ('/') for directory entries in ls output
-Ensuring proper error handling in the sleep command when no argument is provided
-Correctly modifying the Makefile to include new user programs in the build process
+7. **Learn to debug and test complex system-level code**  
+   Master techniques for verifying correctness across different execution paths.
 
+---
 
+# **Project Structure**
 
-Syscalls and Schedulers
-This project extends syscall functionality and implements sophisticated scheduling algorithms:
+1. [**Project 1: Basic System Calls and Commands**](#project-1-basic-system-calls-and-commands)  
+2. [**Syscalls and Schedulers**](#syscalls-and-schedulers)  
+3. [**Virtual Memory**](#virtual-memory)  
+4. [**File Systems**](#file-systems)  
 
-Data Structures:
+Each project builds upon previous ones, creating a progressively more capable and sophisticated operating system.
 
-Process control block extensions to track scheduling-specific information including:
+---
 
-Predicted job length for SJF scheduling
-Ticket count for lottery scheduling
-Priority level for multi-level scheduling
-Runtime statistics for performance analysis
+## **Project 1: Basic System Calls and Commands**
 
+Focuses on **fundamental operations** in xv6, introducing modifications to existing commands and implementing new system calls.
 
-Scheduling queues for maintaining separate lists of processes at different priority levels
-Scheduler-specific context structures to maintain algorithm state across context switches
+### **Data Structures**
 
+- **Process control block** (`struct proc` in `proc.h`): maintains process state, process ID, kernel stack.  
+- **File metadata structures** (`struct stat` in `stat.h`): used by the `ls` command to distinguish between files and directories.  
+- **Syscall function pointer array** (`syscalls[]` in `syscall.c`): maps system call numbers to their implementations.  
+- **System call argument handling** structures for parameter passing from user space to kernel.
 
-Algorithms:
+### **Algorithms**
 
-Shortest Job First (SJF) scheduling with job length prediction mechanisms
-Optional lottery scheduling with:
+- **Command-line argument parsing** for the `sleep` command (using `argv` array).  
+- **File/directory traversal** for the `ls` command (using `struct dirent`).  
+- **System call registration/dispatch** (transition from user space to kernel space).  
+- **Process sleep/wakeup** mechanism for `sleep`.
 
-Ticket allocation and management
-Pseudo-random number generation for fair selection
-Ticket inheritance during process creation
+### **Challenges & Fixes**
 
+- Modifying multiple files (`syscall.h`, `syscall.c`, `user.h`, `usys.S`) for new system calls.  
+- Handling hidden files (dotfiles) in `ls` while preserving original functionality.  
+- Implementing directory indicators (`/`) for `ls`.  
+- Ensuring proper error handling for `sleep` with no arguments.  
+- Updating the **Makefile** to include new user programs.
 
-Optional multi-level priority scheduling with:
+---
 
-Multiple priority queues
-Priority boosting to prevent starvation
-Round-robin scheduling within each priority level
+## **Syscalls and Schedulers**
 
+Extends **syscall functionality** and implements **advanced scheduling algorithms** (SJF, lottery, priority).
 
-uniq command implementation with support for:
+### **Data Structures**
 
-Basic adjacent line deduplication
-Line counting with -c flag
-Unique line filtering with -u flag
-Character-limited comparison with -w flag
+- **Extended process control block**: tracks scheduling info (predicted job length, ticket count, priority level, runtime stats).  
+- **Scheduling queues**: separate lists of processes at different priority levels.  
+- **Scheduler-specific context structures**: maintain algorithm state across context switches.
 
+### **Algorithms**
 
-find command implementation with comprehensive traversal and filtering based on:
+1. **Shortest Job First (SJF)**
+   - Job length prediction (exponential average or random).  
+   - Selects the runnable process with the shortest predicted running time.
 
-Filename matching
-File type filtering
-Inode number comparison
-Custom output formatting
+2. **Lottery Scheduling** (optional)
+   - Assigns tickets to processes.  
+   - Uses pseudo-random selection to pick the next process.  
+   - CPU time is proportional to ticket counts.
 
+3. **Multi-level Priority Scheduling** (optional)
+   - Multiple priority queues.  
+   - Priority boosting to prevent starvation.  
+   - Round-robin within each priority level.
 
+4. **`uniq` command**  
+   - Adjacent line deduplication (`-c`, `-u`, `-w` flags).
 
+5. **`find` command**  
+   - Recursive search with filename matching, file type filtering, inode comparisons, custom formatting.
 
-Challenges and Fixes:
+### **Challenges & Fixes**
 
-Modifying the timer interrupt handling system to incorporate new schedulers without disrupting existing functionality
-Ensuring proper process execution time tracking across multiple scheduling decisions and context switches
-Implementing flexible scheduling algorithm selection at compile time through Makefile modifications
-Managing scheduler state during process creation and termination
-Handling edge cases in the uniq and find commands, particularly for complex flag combinations and piped input/output
+- **Timer interrupt handling** changes for new schedulers.  
+- Tracking **execution time** across scheduling decisions.  
+- **Compile-time scheduler selection** via Makefile.  
+- Managing **scheduler state** during process creation/termination.  
+- Handling edge cases in `uniq` and `find`.
 
+---
 
+## **Virtual Memory**
 
-Virtual Memory
-This project explores memory management in xv6, modifying the default eager allocation strategy:
+Explores **memory management** in xv6, shifting from eager to **lazy allocation**.
 
-Data Structures:
+### **Data Structures**
 
-Page tables (multi-level data structures mapping virtual addresses to physical addresses)
-Process memory size tracking in the process structure (proc->sz)
-Page fault information extracted from trap frames during exception handling
-Memory allocation metadata for tracking allocated pages and their attributes
+- **Page tables** (multi-level structures mapping virtual to physical addresses).  
+- **`proc->sz`**: process memory size tracking.  
+- **Page fault info** from trap frames.  
+- **Allocation metadata** for pages.
 
+### **Algorithms**
 
-Algorithms:
+1. **Trap Handling for Page Faults**  
+   - Distinguishes invalid memory accesses from other traps.  
+   - Allocates physical memory **on-demand**.
 
-Trap handling for page faults, which identifies invalid memory accesses and distinguishes them from other types of exceptions
-Modified sbrk() implementation that adjusts the process memory size without immediate physical memory allocation
-Lazy page allocation that:
+2. **Modified `sbrk()`**  
+   - Adjusts `proc->sz` without immediately allocating memory.
 
-Intercepts page faults
-Validates that the faulting address is within the process's virtual address space
-Allocates physical memory only when accessed
-Updates page tables to map the newly allocated memory
-Resumes program execution transparently
+3. **Lazy Page Allocation**  
+   - Catches page faults.  
+   - Allocates a new physical page.  
+   - Updates page tables.  
+   - Resumes execution transparently.
 
+4. **Locality-aware Allocation** (optional)  
+   - Allocates faulting page plus adjacent pages.  
+   - Reduces fault frequency.
 
-Locality-aware memory allocation that:
+### **Challenges & Fixes**
 
-Allocates the faulting page plus additional adjacent pages
-Provides a performance improvement by reducing the number of page faults
-Balances memory usage with application performance
+- Understanding the **relationship** between `sbrk()`, `growproc()`, and physical allocation.  
+- Correctly **inserting page fault handling** in `trap.c`.  
+- Differentiating **legitimate page faults** from illegal accesses.  
+- Handling **compile-time selection** of allocation strategies.  
+- Ensuring **memory protection** in page tables.
 
+---
 
+## **File Systems**
 
+Extends xv6 file system with **larger file support** and **symbolic links**.
 
-Challenges and Fixes:
+### **Data Structures**
 
-Understanding the intricate relationship between sbrk(), growproc(), and physical memory allocation in the original xv6 implementation
-Identifying the correct location in the trap handling code to insert page fault handling logic
-Ensuring trap handling correctly distinguishes legitimate page faults from invalid memory accesses
-Managing the complexity of multiple allocation strategies selected at compile time
-Correctly updating page tables to maintain memory protection and prevent unauthorized access
-Handling edge cases where page faults occur at process boundaries or in stack growth scenarios
+- **Inode structure** modifications (`struct dinode` in `fs.h`) for double-indirect blocks.  
+- **File descriptor table** entries track offsets for `lseek`.  
+- **Symbolic link metadata** to store target paths.  
+- **Block allocation tables** and **buffer cache** for disk blocks.
 
+### **Algorithms**
 
+1. **File Seeking & Offset Management**  
+   - `lseek(fd, offset)`: Reposition file offsets.  
+   - Handles out-of-bound seeks (hole filling).
 
-File Systems
-This project significantly extends the xv6 file system capabilities:
+2. **Block Mapping (`bmap()`)**  
+   - **Direct blocks** (first 10-11).  
+   - **Single-indirect** (next 128).  
+   - **Double-indirect** (up to 128×128).
 
-Data Structures:
+3. **Symbolic Links**  
+   - `symlink(target, path)`.  
+   - Recursive link resolution with cycle detection.  
+   - Respecting `O_NOFOLLOW` flag.
 
-Inode structure modifications (struct dinode in fs.h) to support double-indirect blocks
-File descriptor table entries that track file offsets for lseek functionality
-Symbolic link metadata structure to store target path information
-Block allocation tables and buffer cache structures for managing disk blocks
+4. **Block Allocation/Freeing**  
+   - For **large files** with multi-level indirection.  
+   - **itrunc()** releases all blocks properly.
 
+### **Challenges & Fixes**
 
-Algorithms:
+- Maintaining **backward compatibility** with the same inode size.  
+- Balancing **direct/indirect/double-indirect** blocks for performance.  
+- Handling **symbolic link cycles** and recursion depth limits.  
+- Zero-filling for sparse files created by `lseek`.  
 
-File seeking and offset management with bounds checking and hole filling:
+---
 
-Repositioning file offsets arbitrarily within a file
-Handling seeks beyond file end that require zero-filling
+# **Key Architectural Decisions**
 
+## **System Call Implementation**
 
-Block mapping algorithm (bmap()) enhancement to support:
+- **Integration** via `syscall.h`, `syscall.c`, `user.h`, `usys.S`.  
+- **Error handling** standardized (negative return values).  
+- **User-space** vs. **kernel-space** separation with well-defined interfaces.
 
-Direct blocks (first 10-11 blocks)
-Single-indirect blocks (next 128 blocks)
-Double-indirect blocks (next 128*128 blocks)
-Lazy block allocation during writes
+## **Scheduler Design**
 
+- **Modular** scheduler implementation with a clear separation between policy and mechanism.  
+- **Compile-time** selection via Makefile flags.  
+- **Backward compatibility** with existing process management.  
+- **Process statistics tracking** (e.g., `ticks_running`).  
+- **Priority inversion** prevention with boosting.
 
-Symbolic link traversal with:
+## **Memory Management**
 
-Recursive resolution of links to targets
-Cycle detection to prevent infinite loops
-Support for the O_NOFOLLOW flag
+- **Lazy allocation** that **transparently** catches page faults.  
+- **Locality-aware** allocation for performance.  
+- **Trap handling** that differentiates legitimate page faults from illegal accesses.  
+- **Compile-time** strategy selection (e.g., `ALLOCATOR=LAZY` or `ALLOCATOR=LOCALITY`).
 
+## **File System Extensions**
 
-Block allocation and freeing for large files with proper cleanup of all indirect blocks
+- **Backward-compatible inode extensions** (double-indirect blocks).  
+- **Symbolic links** stored in inode data blocks.  
+- **`lseek`** integrated with `read/write` ops.  
+- **Sparse file** support with zero-filling.  
+- **Multi-level block mapping** (`bmap`) for large files.
 
+---
 
-Challenges and Fixes:
+# **Functions and Algorithms**
 
-Maintaining backward compatibility while extending inode capabilities without increasing the inode size
-Properly balancing the number of direct, indirect, and double-indirect blocks for optimal file system performance
-Correctly implementing the block allocation and deallocation logic to prevent memory leaks
-Handling symbolic link cycles and implementing a recursion depth limit
-Ensuring file system operations (link, unlink) work correctly with symbolic links
-Implementing zero-filling for sparse files when lseek creates holes
+### **Examples**
 
+- **`hello()`**: Prints a kernel message (`"Hello from the Kernel!"`).  
+- **`ls`** (modified): Hides dotfiles unless `-a` flag is present; appends `/` for directories.  
+- **`sleep n`**: Pauses execution for `n` ticks.  
+- **`ticks_running(pid)`**: Returns process running time in ticks or `-1` if nonexistent.  
+- **`uniq`**: Removes adjacent duplicate lines, supports `-c`, `-u`, `-w`.  
+- **`find`**: Recursive file search with flags like `-type`, `-inum`, `-printi`.
 
+### **Schedulers**
 
-Key Architectural Decisions
+- **SJF**: Predicted job length, picks shortest job next.  
+- **Lottery**: Assign tickets, random draw.  
+- **Priority**: Multiple priority levels, round-robin within each level.
 
-System Call Implementation Approach:
+### **Lazy Allocation**
 
-New system calls are integrated through coordinated modifications to multiple files:
+- **Modified `sbrk(n)`**: Updates process size, no immediate allocation.  
+- **Page fault handler**: Allocates physical memory on first access.  
+- **Locality**: Allocates the faulting page plus neighbors.
 
-syscall.h: Defines system call numbers
-syscall.c: Maps system call numbers to handler functions
-user.h: Declares user-space function prototypes
-usys.S: Contains assembly code for trap to kernel
+### **File System**
 
+- **`lseek(fd, offset)`**: Reposition file offset.  
+- **`symlink(target, path)`**: Create symbolic link.  
+- **`open`** (enhanced): Follows links unless `O_NOFOLLOW`.  
+- **`bmap()`**: Handles direct, single-indirect, and double-indirect blocks.  
+- **`itrunc()`**: Frees all blocks (direct, indirect).
 
-User-facing functionality is clearly separated from kernel implementation, with user programs calling system calls through a well-defined interface
-System call argument passing and validation follow a consistent pattern for safety and security
-Error handling is standardized, with negative return values indicating errors and specific error codes provided where appropriate
+---
 
+# **Building and Running**
 
-Scheduler Design:
+```bash
+# Clean previous builds
+make clean
 
-Modular scheduler implementation with clean separation between scheduling policy and mechanism
-Compile-time scheduler selection through Makefile flags (SCHEDULER=DEFAULT, SJF, LOTTERY, or PRIORITY)
-Schedulers maintain backward compatibility with existing process management functions like sleep/wakeup and process creation/termination
-Process statistics tracking (using ticks_running()) provides a foundation for empirical performance comparison between schedulers
-Careful interrupt handling and synchronization to ensure scheduler correctness during context switches
-Priority inversion prevention through appropriate boosting mechanisms
+# Build xv6 with default configuration
+make
 
+# Run xv6 in QEMU with GUI
+make qemu
 
-Memory Management:
-
-Clear separation between virtual memory policy (when to allocate) and mechanism (how to allocate)
-Lazy allocation implementation that transparently catches page faults and allocates memory on demand
-Locality-aware allocator that reduces the frequency of page faults by pre-allocating adjacent pages
-Compile-time selection between allocation strategies via Makefile flags (ALLOCATOR=LAZY or LOCALITY)
-Careful trap handling that distinguishes legitimate page faults from illegal memory accesses
-Virtual memory layout preserved while changing only the allocation timing
-
-
-File System Extensions:
-
-Backward compatible inode extensions that maintain the same inode size while supporting much larger files
-Strategic reduction of direct blocks (from 12 to 10) to accommodate two double-indirect block pointers
-Fine-grained block allocation that only allocates indirect and double-indirect blocks when needed
-Careful handling of file metadata for symbolic links stored within the inode data blocks
-Complete integration of lseek functionality with existing read/write operations
-Proper bounds checking and error handling for all file operations
-
-
-
-Functions and Algorithms
-
-
-hello(): A system call that prints a message from the kernel
-
-Registers a new system call in syscall.c, syscall.h
-Implements the kernel functionality in sysproc.c
-Outputs "Hello from the Kernel!" to the console
-Returns 0 on success
-
-
-ls modifications: Enhanced directory listing command
-
-Filters out entries starting with '.' unless -a flag is present
-Appends '/' to directory names for visual differentiation
-Parses command-line arguments to detect the -a flag
-Preserves all original functionality while adding new features
-
-
-sleep: A command that pauses execution for a specified number of ticks
-
-Parses the command-line argument to extract sleep duration
-Validates input and prints usage information if invalid
-Converts string argument to integer using atoi()
-Calls the sleep() system call to pause execution
-Returns 0 on successful completion
-
-
-
-
-
-ticks_running(pid): System call that returns process running time
-
-Takes a process ID as input
-Accesses the process table to check if the process exists
-Returns -1 if the process doesn't exist
-Returns 0 if the process exists but hasn't been scheduled yet
-Returns the accumulated running time in ticks for valid processes
-
-
-uniq command: Line deduplication utility with multiple modes
-
-Basic functionality: Removes adjacent duplicate lines
--c flag: Counts and displays the number of occurrences of each line
--u flag: Shows only unique lines (those that appear exactly once)
--w N flag: Compares only the first N characters of each line
-Supports file input or reading from standard input (for pipes)
-Implements proper error handling for invalid inputs or file operations
-
-
-find command: File search utility with various criteria
-
-Basic function: Recursively searches directories for files matching a name
--type f flag: Matches only regular files
--type d flag: Matches only directories
--inum N flag: Matches files with exact inode number
--inum +N flag: Matches files with inode number greater than N
--inum -N flag: Matches files with inode number less than N
--printi flag: Displays the inode number before each matching file
-Supports combining flags for complex search criteria
-
-
-Shortest Job First (SJF) scheduler:
-
-Assigns predicted job lengths to newly created processes using either:
-
-Random assignment for simplicity
-Exponential average based on past behavior
-
-
-Selects the runnable process with the shortest predicted running time
-Updates job length predictions as processes execute
-Implements sjf_job_length(pid) to retrieve job length predictions
-
-
-Lottery scheduler (optional):
-
-Assigns default tickets to all processes
-Provides set_lottery_tickets(tickets) to modify ticket allocation
-Implements get_lottery_tickets(pid) to retrieve ticket counts
-Uses pseudo-random number generation to select the next process
-Distributes CPU time proportionally to assigned tickets
-Handles inheritance of tickets during process creation
-
-
-Priority scheduler (optional):
-
-Supports at least three distinct priority levels
-Provides set_sched_priority(priority) to adjust process priority
-Implements get_sched_priority(pid) to retrieve priority levels
-Always schedules higher priority processes before lower priority ones
-Uses SJF or round-robin scheduling within each priority level
-Includes mechanisms to prevent starvation of low-priority processes
-
-
-
-
-
-Modified sbrk(n): Changes process memory size without allocation
-
-Removes the call to growproc() that normally allocates physical memory
-Simply increments the process size field (proc->sz) by n
-Returns the old process size as the function result
-Sets the stage for lazy allocation by deferring physical memory allocation
-
-
-Page fault handler: On-demand memory allocation
-
-Intercepts page faults in the trap handling code in trap.c
-Verifies the faulting address is within the process's virtual address space
-Extracts the faulting virtual address from the trap frame
-Allocates a new physical page using kalloc()
-Zeroes the newly allocated page for security
-Updates the page table to map the virtual address to the physical page
-Resumes program execution at the faulting instruction
-
-
-Locality-aware allocation: Performance-optimized memory allocation
-
-Calculates the page-aligned address of the faulting memory access
-Allocates the faulting page plus two subsequent pages
-Updates the page table for all allocated pages
-Zeroes all newly allocated pages
-Intelligently handles allocation at memory region boundaries
-Provides a performance improvement by reducing fault frequency
-
-
-
-
-lseek(fd, offset): Repositions file offset
-
-Takes a file descriptor and desired offset as parameters
-Validates the file descriptor is open and valid
-Updates the file's offset position for subsequent read/write operations
-Handles seeks beyond end-of-file by extending the file size
-Coordinates with filewrite to zero-fill any gaps created
-Returns the new position on success or appropriate error code on failure
-
-
-symlink(target, path): Symbolic link creation
-
-Creates a new file of type T_SYMLINK at the specified path
-Stores the target path in the inode's data blocks
-Doesn't require that the target exists when creating the link
-Returns 0 on success or -1 on failure
-Properly handles path lengths and storage limitations
-
-
-Enhanced open(): Symbolic link handling
-
-Detects when a path refers to a symbolic link
-Recursively follows links to their targets
-Respects the O_NOFOLLOW flag to open the link itself
-Implements cycle detection with a maximum recursion depth
-Returns appropriate error codes for invalid links
-
-
-Enhanced bmap(): Multi-level block mapping
-
-Handles direct blocks (first 10-11 blocks)
-Manages single-indirect blocks (next 128 blocks)
-Supports double-indirect blocks (up to 128*128 blocks per pointer)
-Allocates indirect blocks only when needed
-Calculates the correct block number based on logical file position
-Returns the disk block number corresponding to a logical block
-
-
-Enhanced itrunc(): Complete file block freeing
-
-Releases all allocated blocks when truncating a file
-Properly handles single and double-indirect blocks
-Frees indirect blocks after freeing their referenced data blocks
-Prevents memory leaks by ensuring all blocks are properly freed
-Sets the file size to zero and updates the inode
-
-
-
-Specific Commands
-Building and Running
-Copymake clean               # Cleans previous build artifacts including filesystem image
-make                     # Builds xv6 with default configuration
-make qemu               # Runs xv6 in QEMU emulator with GUI
-make qemu-nox           # Runs xv6 in QEMU without GUI (console-only mode)
+# Run xv6 in QEMU (console-only)
+make qemu-nox
 
 # Scheduler selection
-make qemu SCHEDULER=DEFAULT   # Use default round-robin scheduler
-make qemu SCHEDULER=SJF       # Use Shortest Job First scheduler
-make qemu SCHEDULER=LOTTERY   # Use lottery scheduler (if implemented)
-make qemu SCHEDULER=PRIORITY  # Use priority scheduler (if implemented)
+make qemu SCHEDULER=DEFAULT
+make qemu SCHEDULER=SJF
+make qemu SCHEDULER=LOTTERY
+make qemu SCHEDULER=PRIORITY
 
 # Memory allocator selection
-make qemu ALLOCATOR=LAZY      # Use basic lazy allocation
-make qemu ALLOCATOR=LOCALITY  # Use locality-aware allocation with prefetching
-Project 1 Commands
-Copyhello                   # Run the hello program (outputs "Hello Xv6!" and "Hello from the Kernel!")
-ls                      # List directory contents (modified to hide hidden files and show directory indicators)
-ls -a                   # List all files including hidden ones (those starting with '.')
-sleep 10                # Sleep for 10 timer ticks
-sleep 100               # Sleep for 100 timer ticks (approximately 10 seconds)
-sleep                   # Without arguments - should display error message
-Commands
-Copy# uniq command examples
-uniq filename.txt       # Filter adjacent repeated lines in filename.txt
-uniq -c filename.txt    # Show counts of adjacent repeated lines
-uniq -u filename.txt    # Show only lines that appear once (no duplicates)
-uniq -w 5 filename.txt  # Compare only first 5 characters of each line
-cat filename.txt | uniq # Filter repeated lines from standard input
+make qemu ALLOCATOR=LAZY
+make qemu ALLOCATOR=LOCALITY
+```
 
-# find command examples
-find / -name file.txt              # Find file.txt starting from root
-find . -name "*.c"                 # Find all .c files in current directory
-find /etc -name passwd -type f     # Find only regular files named passwd
-find /home -name Documents -type d # Find only directories named Documents
-find / -name file.txt -inum 42     # Find files named file.txt with inode 42
-find / -name "*.c" -inum +100      # Find .c files with inode number > 100
-find / -name "*.h" -inum -50       # Find .h files with inode number < 50
-find / -name file.txt -printi      # Find file.txt and show inode numbers
+---
 
-# Scheduler testing commands
-ticks_running_test          # Display running time of current and other processes
-simple_scheduler_test       # Test and compare SJF scheduler behavior
-advanced_scheduler_test     # Test lottery or priority scheduler behavior
-sjf_job_length 1            # Display predicted job length for process with PID 1
-set_lottery_tickets 50      # Set current process's lottery tickets to 50
-get_lottery_tickets 2       # Get lottery tickets for process with PID 2
-set_sched_priority 2        # Set current process's priority to level 2 (high)
-get_sched_priority 3        # Get priority level for process with PID 3
-Project 3 Commands
-Copy# Virtual memory testing
-vm_test                     # Test lazy allocation behavior
-vm_locality_test            # Test locality-aware allocation behavior
+# **Project-Specific Commands**
+
+### **Project 1**
+
+```bash
+hello            # Outputs "Hello Xv6!" and "Hello from the Kernel!"
+ls               # Lists directory contents
+ls -a            # Includes hidden files
+sleep 10         # Sleeps for 10 ticks
+sleep 100        # Sleeps for 100 ticks (about 10 seconds)
+```
+
+### **Syscalls and Schedulers**
+
+```bash
+uniq filename.txt            # Filters adjacent repeated lines
+uniq -c filename.txt         # Counts occurrences
+uniq -u filename.txt         # Shows only unique lines
+uniq -w 5 filename.txt       # Compares first 5 characters
+cat file.txt | uniq          # Reads from stdin
+
+find / -name file.txt        # Searches for file.txt from root
+find . -name "*.c"           # Finds .c files in current directory
+find /etc -name passwd -type f
+find /home -name Documents -type d
+find / -name file.txt -printi
+
+ticks_running_test           # Display running time of processes
+simple_scheduler_test        # Tests SJF behavior
+advanced_scheduler_test      # Tests lottery or priority
+set_lottery_tickets 50       # Assign 50 tickets to current process
+get_lottery_tickets 2        # Get ticket count for PID 2
+set_sched_priority 2         # Set priority to level 2
+get_sched_priority 3         # Get priority for PID 3
+```
+
+### **Virtual Memory & File Systems**
+
+```bash
+# Virtual memory tests
+vm_test
+vm_locality_test
 
 # File system commands
-lseek_test                  # Demonstrate lseek functionality
-symlink_test                # Test symbolic link creation and traversal
-largefiles_test             # Create and verify large files with double-indirect blocks
+lseek_test
+symlink_test
+largefiles_test
 
-# Example usages
-symlink /etc/passwd passwd_link     # Create symbolic link to /etc/passwd
-cat passwd_link                     # Access file through the link
-open passwd_link O_NOFOLLOW         # Open the link itself, not the target
-Future Work
-Potential Improvements
+# Symlink example
+symlink /etc/passwd passwd_link
+cat passwd_link
+open passwd_link O_NOFOLLOW
+```
 
-Scheduler Enhancements:
+---
 
-Add dynamic priority adjustments based on CPU usage patterns, implementing an aging mechanism that gradually increases priority for processes that have been waiting a long time
-Implement a completely fair scheduler (CFS) similar to Linux that uses a red-black tree to track process virtual runtime
-Add support for real-time scheduling constraints with deadline-based scheduling policies
-Implement scheduler activations for better user-level thread scheduling
-Create a hybrid scheduler that dynamically switches algorithms based on system load
-Add CPU affinity support for processes in a multi-core extension of xv6
+# **Future Work**
 
+### **Potential Improvements**
 
-Memory Management:
+1. **Scheduler Enhancements**
+   - Dynamic priority adjustments (aging mechanism).  
+   - Completely Fair Scheduler (CFS) approach.  
+   - Real-time constraints (deadline scheduling).  
+   - Scheduler activations for user-level threading.
 
-Implement swapping to disk for better memory utilization when physical memory is limited
-Add support for memory protection between processes with explicit shared memory regions
-Implement demand paging from executable files rather than just zero-filling
-Add support for memory-mapped files (mmap) for more efficient file I/O
-Implement copy-on-write fork() to reduce memory usage and increase fork performance
-Add support for huge pages to reduce TLB pressure for large allocations
-Implement a more sophisticated page replacement algorithm like clock or LIRS
+2. **Memory Management**
+   - Swapping to disk for better memory utilization.  
+   - Shared memory regions for IPC.  
+   - Demand paging from executables.  
+   - Copy-on-write `fork()`.  
+   - Huge pages for TLB optimization.
 
+3. **File System**
+   - Journaling for crash resilience.  
+   - File system compression.  
+   - Access Control Lists (ACLs).  
+   - More sophisticated block allocation strategies.  
+   - File system quotas.  
+   - Extended attributes.
 
-File System:
+### **Known Limitations**
 
-Add journaling capabilities for improved reliability after system crashes
-Implement file system compression to save disk space
-Add support for access control lists for more fine-grained permissions
-Implement a more sophisticated block allocation strategy to reduce fragmentation
-Add support for file system quotas to limit user disk usage
-Implement soft updates or delayed writes for performance improvement
-Add support for extended attributes to store metadata alongside files
-Implement readahead and write-behind in the buffer cache for better I/O performance
+- **Schedulers**: No real-time constraints, no CPU affinity, limited performance metrics, possible starvation in SJF.  
+- **Memory**: No swapping, limited protection, no shared memory, local allocations may waste space.  
+- **File System**: Max file size ~16MB, no journaling, limited directory performance, no atomic rename.
 
+---
 
+## **Conclusion**
 
-Known Limitations
+These projects provide a solid foundation for **understanding operating system concepts** by directly modifying xv6. Each module builds upon the last, culminating in a more **robust and feature-rich system**. However, there remain **ample opportunities** for further enhancements and advanced feature implementations, offering a rich learning platform for aspiring systems programmers.
 
-Scheduler Limitations:
+---
 
-Current scheduler implementations may not handle extreme cases efficiently, such as a mix of CPU-bound and I/O-bound processes
-Limited performance metrics for scheduler evaluation make it difficult to quantitatively compare algorithms
-No support for process groups or sessions for job control
-SJF implementation is vulnerable to starvation for long-running processes
-No support for real-time constraints or deadlines
-Simple priority implementation may suffer from priority inversion problems
-
-
-Memory Management:
-
-No support for memory compression or swapping, limiting total memory usage to physical RAM
-Limited protection between processes could lead to security vulnerabilities
-Lazy allocation implementation may not handle all edge cases, particularly around stack growth
-No support for shared memory between processes for efficient inter-process communication
-Locality-aware allocation may waste memory by allocating pages that are never used
-No support for limiting a process's memory consumption
-
-
-File System:
-
-File size still has practical limits even with double-indirect blocks (maximum file size of ~16MB)
-No support for file system journaling, making the system vulnerable to corruption after crashes
-Limited symbolic link safety measures may allow complex security exploits
-No atomic rename operation for safer file updates
-Inefficient directory implementation for directories with many entries
-No support for hard links across directories
-Limited caching strategy that doesn't consider usage patterns
-
-
-
-The projects provide a solid foundation for understanding operating system concepts, but there are many opportunities for further enhancement to create a more robust and feature-rich system. Implementing some of these improvements would provide valuable experience with advanced operating system concepts and techniques used in production operating systems.
+**Thank you for exploring this xv6-based Operating Systems project!** If you have any questions or suggestions, feel free to open an issue or submit a pull request.
