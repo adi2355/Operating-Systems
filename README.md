@@ -32,7 +32,7 @@ These projects systematically modify and extend xv6's functionality across multi
 
 # **Project Structure**
 
-1. [**Project 1: Basic System Calls and Commands**](#project-1-basic-system-calls-and-commands)  
+1. [**Basic System Calls and Commands**](#project-1-basic-system-calls-and-commands)  
 2. [**Syscalls and Schedulers**](#syscalls-and-schedulers)  
 3. [**Virtual Memory**](#virtual-memory)  
 4. [**File Systems**](#file-systems)  
