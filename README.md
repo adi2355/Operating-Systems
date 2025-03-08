@@ -41,7 +41,7 @@ Each project builds upon previous ones, creating a progressively more capable an
 
 ---
 
-## **Project 1: Basic System Calls and Commands**
+## ** Basic System Calls and Commands**
 
 Focuses on **fundamental operations** in xv6, introducing modifications to existing commands and implementing new system calls.
 
