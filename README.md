@@ -285,9 +285,9 @@ make qemu ALLOCATOR=LOCALITY
 
 ---
 
-# **Project-Specific Commands**
+# **Specific Commands**
 
-### **Project 1**
+### ****
 
 ```bash
 hello            # Outputs "Hello Xv6!" and "Hello from the Kernel!"
